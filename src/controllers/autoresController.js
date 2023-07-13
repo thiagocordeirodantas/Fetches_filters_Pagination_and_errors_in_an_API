@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import autores from "../models/Autor.js";
 
 class AutorController {
@@ -16,10 +17,19 @@ class AutorController {
     try {
       const id = req.params.id;
       const listandoPorID = await autores.findById(id);
-      res.status(200).json(listandoPorID);
-      
+    
+        if(listandoPorID !== null){
+          res.status(200).json(listandoPorID);
+        } else {
+          req.status(404).json({message: "Nao foi possiver localizar esse Identificador"});
+        }
     } catch (err){
-      req.status(400).json({message: "Nao foi possiver localizar esse Identificador"});
+      if(err instanceof mongoose.Error.CastError){
+        res.status(400).send({message: "Um ou mais dados fornecidos estao incorretos"})
+      } else {
+        res.status(500).send({message: "Erro interno de servidor"})
+      }
+
     }
   };
 
