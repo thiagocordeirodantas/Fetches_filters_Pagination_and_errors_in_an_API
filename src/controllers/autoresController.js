@@ -1,3 +1,4 @@
+import NaoEncontrado from "../err/NaoEncontrado.js";
 import autores from "../models/Autor.js";
 
 class AutorController {
@@ -20,7 +21,7 @@ class AutorController {
       if(listandoPorID !== null){
         res.status(200).json(listandoPorID);
       } else {
-        req.status(404).json({message: "Nao foi possiver localizar esse Identificador"});
+        next( new NaoEncontrado("Nao foi possiver localizar esse Identificador"));
       }
     } catch (err){
       next(err);
