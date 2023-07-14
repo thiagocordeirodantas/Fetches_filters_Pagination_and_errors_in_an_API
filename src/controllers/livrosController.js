@@ -1,3 +1,4 @@
+import NaoEncontrado from "../err/NaoEncontrado.js";
 import livros from "../models/Livro.js";
 
 class LivroController {
@@ -13,13 +14,20 @@ class LivroController {
   };
   
   static listarLivroPorId = async (req, res, next) => {
-    const id = req.params.id;
     try {
-      const listaLivrosID = await livros.findById(id)
-        .populate("autor", "nome");
-      res.status(200).send(listaLivrosID);
-    } catch(err) {
-      next(err);
+      const id = req.params.id;
+
+      const livroResultado = await livros.findById(id)
+        .populate("autor", "nome")
+        .exec();
+
+      if (livroResultado !== null) {
+        res.status(200).send(livroResultado);
+      } else {
+        next(new NaoEncontrado("Id do livro não localizado."));
+      }
+    } catch (erro) {
+      next(erro);
     }
   };
 
@@ -35,23 +43,34 @@ class LivroController {
   };
 
   static atualizarLivro = async (req, res, next) => {
-   
     try {
       const id = req.params.id;
-      await livros.findByIdAndUpdate(id, {$set: req.body});
-      res.status(200).send({message: "Livro atualizado com sucesso"});
-    } catch(err){
-      next(err);
+
+      const livroResultado = await livros.findByIdAndUpdate(id, {$set: req.body});
+
+      if (livroResultado !== null) {
+        res.status(200).send({message: "Livro atualizado com sucesso"});
+      } else {
+        next(new NaoEncontrado("Id do livro não localizado."));
+      }
+    } catch (erro) {
+      next(erro);
     }
   };
-
+  
   static excluirLivro = async (req, res, next) => {
-    const id = req.params.id;
     try {
-      await livros.findByIdAndDelete(id);
-      res.status(200).send({message: "Livro removido com sucesso"});
-    } catch(err) {
-      next(err);
+      const id = req.params.id;
+
+      const livroResultado = await livros.findByIdAndDelete(id);
+
+      if (livroResultado !== null) {
+        res.status(200).send({message: "Livro removido com sucesso"});
+      } else {
+        next(new NaoEncontrado("Id do livro não localizado."));
+      }
+    } catch (erro) {
+      next(erro);
     }
   };
 
